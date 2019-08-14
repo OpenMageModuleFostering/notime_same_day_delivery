@@ -47,11 +47,10 @@ class Notime_Shipping_Model_Observer
 
                                     $client = new Varien_Http_Client();
 
-                                    $client->setUri('http://nt-staging-api.azurewebsites.net/api/shipment/approve')
+                                    $client->setUri('https://v1.notimeapi.com/api/shipment/approve')
                                         ->setConfig(array('timeout' => 30, 'keepalive' => 1))
                                         ->setHeaders(array(
                                         'Ocp-Apim-Subscription-Key' => '493dc25bf9674ccb9c5920a035c1f777',
-                                        'authorization' => 'Basic YXp1cmUtc2hpcG1lbnRhcGk6UTEhZTQzYjczWA==',
                                     ))
                                         ->setRawData(json_encode($params), 'application/json')
                                         ->setMethod(Zend_Http_Client::POST);
