@@ -36,6 +36,7 @@ class Notime_Shipping_Model_Observer
                                     'ShipmentId' => $shipment_id,
                                     'Dropoff' => array(
                                         'Name' => $_shippingAddress->getFirstname() .' '. $_shippingAddress->getLastname(),
+                                        'ContactName' => $_shippingAddress->getFirstname() .' '. $_shippingAddress->getLastname(),
                                         'Phone' => $_shippingAddress->getTelephone(),
                                         'City' => $_shippingAddress->getCity(),
                                         'CountryCode' => $_shippingAddress->getCountryId(),
@@ -98,7 +99,7 @@ class Notime_Shipping_Model_Observer
         $request = Mage::app()->getRequest();
         $shipmentId = trim($request->getPost('notime_shipment_id'));
 
-        if($shipmentId == '') { exit; }
+        if($shipmentId == '') { return; }
 
         try {
 
