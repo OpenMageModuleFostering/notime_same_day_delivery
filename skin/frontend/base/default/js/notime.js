@@ -30,12 +30,12 @@ NotimeShippingForm.prototype = {
             }
         );
     },
+	_isNotimeShippingSelected: function(){
+        var selectedShippingMethod = $$('input[name="shipping_method"]:checked');
+        return this.rate_id == selectedShippingMethod.pluck('value');
+    },
     _toggleForm: function(){
-        var selectedShippingMethodCode = $$('input[name="shipping_method"]:checked');
-
-        //alert(selectedShippingMethodCode.pluck('value'));
-
-        if(this.rate_id == selectedShippingMethodCode.pluck('value')){
+        if(this._isNotimeShippingSelected()){
             this.formElement.show();
         }else{
             this.formElement.hide();
@@ -45,16 +45,23 @@ NotimeShippingForm.prototype = {
         var self = this;
 
         Validation.add('required-notime-shipment',Translator.translate('Click here and choose your delivery time-slot'),function(value){
-            var $notimeWidgetNotSupportedPostcodeContainer = $('notimeWidgetNotSupportedPostcodeContainer');
-            if((value != '' && value != '-') || $notimeWidgetNotSupportedPostcodeContainer.visible())
-            {
-                return true;
-            }
-            return false;
+			if(self._isNotimeShippingSelected() !== true){
+				return true;
+			}
+			var $notimeWidgetNotSupportedPostcodeContainer = $('notimeWidgetNotSupportedPostcodeContainer');
+			if((value != '' && value != '-') || $notimeWidgetNotSupportedPostcodeContainer.visible())
+			{	
+				return true;
+			}
+			return false;
         });
 
 
         Validation.add('required-notime-shipment-notsupported',Translator.translate('Please choose another postcode or another delivery method'),function(value){
+			if(self._isNotimeShippingSelected() !== true){
+				return true;
+			}
+			
             var $notimeWidgetNotSupportedPostcodeContainer = $('notimeWidgetNotSupportedPostcodeContainer');
             if((value == '' || value == '-') && $notimeWidgetNotSupportedPostcodeContainer.visible())
             {
