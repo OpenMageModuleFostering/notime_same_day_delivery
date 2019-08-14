@@ -87,7 +87,7 @@ class Notime_Shipping_Model_Observer
      *
      */
     public function notime_shipping_save_shipment_id($event) {
-
+        if(!Mage::getStoreConfig('carriers/notime/active', Mage::app()->getStore()->getId())) return;
         $_quote  = $event->getQuote();
 
         $request = Mage::app()->getRequest();
@@ -118,6 +118,7 @@ class Notime_Shipping_Model_Observer
 
     public function notime_shipping_core_block_html_after($observer)
     {
+        if(!Mage::getStoreConfig('carriers/notime/active', Mage::app()->getStore()->getId())) return;
         /* @var $block Mage_Core_Block_Abstract */
         $block = $observer->getBlock();
         $template = $block->getTemplate();
