@@ -41,7 +41,13 @@ class Notime_Shipping_Model_Observer
                                         'City' => $_shippingAddress->getCity(),
                                         'CountryCode' => $_shippingAddress->getCountryId(),
                                         'Postcode' => $_shippingAddress->getPostcode(),
-                                        'Streetaddress' => implode(' ',$_shippingAddress->getStreet())
+                                        'Streetaddress' => implode(' ',$_shippingAddress->getStreet()),
+                                        'ContactEmailAddress' => $_shippingAddress->getEmail()
+                                    ),
+                                    'EndUser' => array(
+                                        'FullName' => $_shippingAddress->getFirstname() .' '. $_shippingAddress->getLastname(),
+                                        'Phone' => $_shippingAddress->getTelephone(),
+                                        'Email' => $_shippingAddress->getEmail()
                                     )
                                 );
 
