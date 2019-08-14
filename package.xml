@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package>
+    <name>notime_same_day_delivery</name>
+    <version>1.0.0</version>
+    <stability>stable</stability>
+    <license uri="https://opensource.org/licenses/osl-3.0.php">Open Software License (OSL)</license>
+    <channel>community</channel>
+    <extends/>
+    <summary>It is an extension that allows merchants to add  same-day shipping by notime to the store. notime is supported in all major Swiss cities.</summary>
+    <description>This extension allows a merchant to add a same-day shipping option to their store. &#xD;
+notime same-day shipping is provided by notime AG based in Z&#xFC;rich Switzerland and currently supports shipping to all major Swiss cities.&#xD;
+With this new shipping method customers can view and pick from the available delivery time-slots. &#xD;
+The popup can be placed either in the preview section, next to the product, and/or in the checkout page.&#xD;
+The merchant can configure this shipping method in the "Shipping methods" area and "Product Information" area.</description>
+    <notes>Initial release</notes>
+    <authors><author><name>notime</name><user>notime</user><email>dmitry.zhersh@notime.eu</email></author></authors>
+    <date>2016-04-04</date>
+    <time>20:17:25</time>
+    <contents><target name="magelocal"><dir name="Notime"><dir name="Shipping"><dir name="Block"><dir name="Checkout"><dir name="Onepage"><dir name="Shipping"><file name="Notime.php" hash="3cf3bb2779a9a35cca776de23e2a3665"/></dir></dir></dir><dir name="Product"><file name="Widget.php" hash="e72292e3c7e8aed1909f4584fd1ea037"/></dir><file name="ShippingMethod.php" hash="b7cd80898a2a06821e6104a35b90b61e"/></dir><dir name="Helper"><file name="Data.php" hash="42686d5dffb62fdfc799d4a052daa968"/></dir><dir name="Model"><dir name="Carrier"><file name="Notime.php" hash="99b8d655f7cb95afe2bcbcacc88b117f"/></dir><file name="Observer.php" hash="9cc155e599af50eeeb515593fbbfbcff"/></dir><dir name="etc"><file name="config.xml" hash="955c73f3617e118da4df2c1dc8a1122f"/><file name="system.xml" hash="bd8747f9d8f1588fa19f779dd3cc0c90"/></dir><dir name="sql"><dir name="notimeshipping_setup"><file name="mysql4-install-1.0.0.php" hash="7647e9d736ac1199cb7732358b539be6"/><file name="mysql4-upgrade-1.0.0-1.0.1.php" hash="e15b6ad29a30175b3afca7280d1162ce"/></dir></dir></dir></dir></target><target name="magedesign"><dir name="frontend"><dir name="base"><dir name="default"><dir name="layout"><file name="notime.xml" hash="3c16298a844be38a8a6d2a7ee615d6b9"/></dir><dir name="template"><dir name="notime"><dir name="checkout"><dir name="onepage"><dir name="shipping_method"><file name="notime.phtml" hash="c5575bafdd7af6e904f7c3e9f71d31e7"/></dir></dir></dir><dir name="product"><file name="widget.phtml" hash="23da2d2a03f095b8fe467c9c5c6b3c96"/></dir></dir></dir></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="Notime_Shipping.xml" hash="f5de879b88f342a03e16c4d655867b21"/></dir></target><target name="magelocale"><dir><dir name="de_DE"><file name="Notime_Shipping.csv" hash="14d216f093725c72aca60b1a165a084a"/></dir><dir name="en_US"><file name="Notime_Shipping.csv" hash="ef8c967d4c44a6afe1f01b9cde9ff761"/></dir><dir name="fr_FR"><file name="Notime_Shipping.csv" hash="ef8c967d4c44a6afe1f01b9cde9ff761"/></dir></dir></target><target name="mageskin"><dir name="frontend"><dir name="base"><dir name="default"><dir name="css"><file name="notime.css" hash="d41d8cd98f00b204e9800998ecf8427e"/></dir><dir name="js"><file name="notime.js" hash="7678c5eebe3ccd258d1a1fcac13bdaa5"/></dir></dir></dir></dir></target></contents>
+    <compatible/>
+    <dependencies><required><php><min>5.4.0</min><max>7.0.4</max></php></required></dependencies>
+</package>

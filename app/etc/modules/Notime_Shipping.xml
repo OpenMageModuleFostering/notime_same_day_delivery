@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Notime_Shipping>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Notime_Shipping>
+    </modules>
+</config>
+        
+        

@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <checkout_multishipping_shipping>
+        <reference name='checkout_shipping'>
+            <action method='setTemplate'><template>gls/checkout/multishipping/shipping.phtml</template></action>
+        </reference>
+        <reference name="head">
+            <action method="addItem"><type>skin_js</type><name>js/notime.js</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/notime.css</name></action>
+        </reference>
+    </checkout_multishipping_shipping>
+
+    <checkout_onepage_index>
+        <reference name="head">
+            <action method="addItem"><type>skin_js</type><name>js/notime.js</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/notime.css</name></action>
+        </reference>
+    </checkout_onepage_index>
+
+    <firecheckout_index_index>
+        <reference name="head">
+            <action method="addItem"><type>skin_js</type><name>js/notime.js</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/notime.css</name></action>
+        </reference>
+    </firecheckout_index_index>
+
+    <onepagecheckout_index_index>
+        <reference name="head">
+            <action method="addItem"><type>skin_js</type><name>js/notime.js</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/notime.css</name></action>
+        </reference>
+    </onepagecheckout_index_index>
+
+    <opc_index_index>
+        <reference name="head">
+            <action method="addItem"><type>skin_js</type><name>js/notime.js</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/notime.css</name></action>
+        </reference>
+    </opc_index_index>
+
+    <onestepcheckout_index_index>
+        <reference name="head">
+            <action method="addItem"><type>skin_js</type><name>js/notime.js</name></action>
+            <action method="addItem"><type>skin_css</type><name>css/notime.css</name></action>
+        </reference>
+    </onestepcheckout_index_index>
+    <!--
+    <checkout_onepage_index>
+        <reference name="head">
+            <block type="core/text" name="notimewidget">
+                <action method="setText"><text><![CDATA[<script src="//nt-staging-servicemanagement.azurewebsites.net/NotimeWidget?groupId=28228cfe-12f2-4bfb-b8bf-b7ff87746e96&mode=2&notimeButtonNumber=1&language=en"></script>]]></text></action>
+            </block>
+        </reference>
+    </checkout_onepage_index>
+        -->
+
+    <!--
+    <checkout_onepage_index>
+        <reference name="checkout.onepage.shipping_method.available">
+            <action method="setTemplate"><template>notime/shipping_method/available.phtml</template></action>
+        </reference>
+    </checkout_onepage_index>
+    <checkout_onepage_shippingmethod>
+        <reference name="root">
+            <action method="setTemplate"><template>notime/shipping_method/available.phtml</template></action>
+        </reference>
+    </checkout_onepage_shippingmethod>
+    -->
+    <!-- add widget into product view page -->
+    <catalog_product_view>
+        <reference name="product.info.additional">
+            <block type="notimeshipping/product_widget" name="notimeshipping_product_widget" as="notimeshipping.product.widget" template="notime/product/widget.phtml" />
+        </reference>
+    </catalog_product_view>
+</layout>

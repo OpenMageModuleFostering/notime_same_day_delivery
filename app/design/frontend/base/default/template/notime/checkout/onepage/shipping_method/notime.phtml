@@ -1,0 +1,64 @@
+<?php
+    $carrier = $this->getMethodInstance();
+    $formCode = $this->getFormCode();
+    $rate_id = 'notime_notime';
+    $zipInputId = 'gls_zip_input_'.$formCode;
+?>
+
+<ul class="form-list" id="<?php echo $formCode ?>">
+    <input type="hidden" id="<?php echo $this->getWidgetZipCode();?>" name="magento_notime_zip_code" value="<?php echo $this->getQuote()->getShippingAddress()->getPostcode();?>">
+    <input type="hidden" id="notime_shipment_id" name="notime_shipment_id" class="input-text required-notime-shipment" value="-">
+    <input type="hidden" id="notime_shipment_fee" name="notime_shipment_fee" class="input-text" value="">
+    <li>
+        <?php echo $this->getWidgetButton(); ?>
+        <span id="notime_shipment_success"></span>
+    </li>
+    <script type="text/javascript">
+        var myEventHandler = function(event) {
+            var generatedId = event.detail.generatedShippmentGuid;
+            var shipmentFee = event.detail.fee;
+            if(generatedId) {
+                $('notime_shipment_id').setValue(generatedId);
+                $('notime_shipment_fee').setValue(shipmentFee);                
+                //var oldPriceWithCurrency = $$("label[for='s_method_notime_notime'] > span[class='price']")[0].innerHTML;
+                //var newPriceWithCurrency = oldPriceWithCurrency.replace(/\d+(\.\d{1,2})?/gi, shipmentFee);
+                //$$("label[for='s_method_notime_notime'] > span[class='price']")[0].update(newPriceWithCurrency);                
+                var $validationError = $('advice-required-notime-shipment-notime_shipment_id');
+                if($validationError){
+                    $validationError.hide();
+                }
+                $('notime_shipment_success').update('<?php echo $this->__('You have successfully selected time window'); ?>');
+            }
+        }
+        document.body.addEventListener("notime_widget:shipmentGenerated",myEventHandler);
+
+        function load_js() {
+            var head= document.getElementsByTagName('head')[0];
+            var script= document.createElement('script');
+            script.type= 'text/javascript';
+            script.src= '<?php echo $this->getWidgetCodeSrc(); ?>';
+            head.appendChild(script);
+            //            http://nt-staging-servicemanagement.azurewebsites.net/NotimeWidget?groupId=28228cfe-12f2-4bfb-b8bf-b7ff87746e96&mode=2&ecommerceZipCodeId=magentoNotimeZipCode&notimeButtonNumber=1&language=en';
+
+        }
+        load_js();
+    </script>
+
+    <script type="text/javascript">
+        // <![CDATA[
+
+        document.observe('dom:loaded', function(){
+            createNotimeShippingForm<?php echo $formCode ?>();
+        });
+
+        createNotimeShippingForm<?php echo $formCode ?>();
+
+        function createNotimeShippingForm<?php echo $formCode ?>(){
+            new NotimeShippingForm('<?php echo $rate_id; ?>','<?php echo $formCode; ?>');
+        }
+        
+         Translator.add('Click here and choose your delivery time-slot','<?php echo Mage::helper('notimeshipping')->__('Click here and choose your delivery time-slot')?>');
+
+        // ]]>
+    </script>
+</ul>
