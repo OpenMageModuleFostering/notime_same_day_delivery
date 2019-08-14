@@ -2,8 +2,8 @@
     $carrier = $this->getMethodInstance();
     $formCode = $this->getFormCode();
     $rate_id = 'notime_notime';
-    $zipInputId = 'gls_zip_input_'.$formCode;
     $priceTemplate = Mage::helper('core')->currency(0, true, false); //template of price with currency
+
     $matches = array();
     preg_match('/[\.,\,]/', $priceTemplate, $matches);
     $priceSeparator = $matches[0];
@@ -14,17 +14,19 @@
         <span id="notime_shipment_additional_text"><?php echo $this->getAdditionalText(); ?></span>
     </li>
     <input type="hidden" id="<?php echo $this->getWidgetZipCode();?>" name="magento_notime_zip_code" value="<?php echo $this->getQuote()->getShippingAddress()->getPostcode();?>">
-    <input type="hidden" id="notime_shipment_id" name="notime_shipment_id" class="input-text required-notime-shipment" value="-">
-    <input type="hidden" id="notime_shipment_fee" name="notime_shipment_fee" class="input-text" value="">
-	<input type="hidden" id="notime_confirmed_time_window_description" name="notime_confirmed_time_window_description" class="input-text" value="">
-	<div id='notimeWidgetNotSupportedPostcodeContainer'>
-    <span><?php echo $this->__('Not Supported Postcode'); ?></span>
+    <input type="hidden" id="notime_shipment_id" name="notime_shipment_id" class="input-text required-notime-shipment required-notime-shipment-notsupported" value="<?php echo $this->getShipmentId(); ?>">
+    <input type="hidden" id="notime_shipment_fee" name="notime_shipment_fee" class="input-text" value="<?php echo $this->getShipmentFee(); ?>">
+    <input type="hidden" id="notime_confirmed_time_window_description" name="notime_confirmed_time_window_description" class="input-text" value="<?php echo $this->getShipmentInfo(); ?>">
+
+    <div id='notimeWidgetNotSupportedPostcodeContainer'>
+        <span><?php echo $this->__('Not Supported Postcode'); ?></span>
 	</div>
     <li>
         <?php echo $this->getWidgetButton(); ?>
         <span id="notime_shipment_success"></span>
     </li>
     <script type="text/javascript">
+
 	// <![CDATA[
 		function getShippingPriceLabel(){
 			return $$("label[for='s_method_notime_notime'] span[class='price']")[0];
@@ -32,34 +34,60 @@
         
         function updateShippingPriceLabel(fee){
 			var priceLabel = getShippingPriceLabel();
-			if (fee !== ''){
+			if (fee !== '' && fee != 0){
 				var feeStr = fee.toString().replace(/[\.,\,]/g, '<?php echo $priceSeparator; ?>');
 				var priceStr = '<?php echo $priceTemplate; ?>'.replace(/\d+([\.,\,]\d{1,2})?/gi, feeStr);
 				priceLabel.update(priceStr); 
 			}
 			else{
-				priceLabel.update(""); 
+				priceLabel.update('');
 			}
         }
-		
+
+        function updateShippingSuccessMessage() {
+            var shipmentId = $('notime_shipment_id').getValue();
+            var shipmentFee = $('notime_shipment_fee').getValue();
+
+            updateShippingPriceLabel(shipmentFee);
+
+            if(shipmentId == '' || shipmentId == '-') {
+                $('notime_shipment_success').update('');
+            } else {
+                $('notime_shipment_success').update('<?php echo $this->__('You have successfully selected time window'); ?>');
+            }
+        }
+
         var shipmentGeneratedHandler = function(event) {
+
+            var shipmentPostcode = $('<?php echo $this->getWidgetZipCode();?>').getValue();
+
             var generatedId = event.detail.generatedShippmentGuid;
             var shipmentFee = event.detail.fee;
-			var confirmedTimeWindowDescription = event.detail.selectedTimeWindowDescription;
+            var selectedTimeWindowDate = event.detail.selectedTimeWindowDate;
+            var selectedServiceGuid = event.detail.selectedServiceGuid;
+
             if(generatedId) {
                 $('notime_shipment_id').setValue(generatedId);
                 $('notime_shipment_fee').setValue(shipmentFee);
-				$('notime_confirmed_time_window_description').setValue(confirmedTimeWindowDescription);
-				updateShippingPriceLabel(shipmentFee);
+
                 var $validationError = $('advice-required-notime-shipment-notime_shipment_id');
                 if($validationError){
                     $validationError.hide();
                 }
-                $('notime_shipment_success').update('<?php echo $this->__('You have successfully selected time window'); ?>');
+
+                updateShippingSuccessMessage();
 
                 // update totals
                 var urlNotime = '<?php echo $this->getUrl('notimeshipping/index/index', array('_secure' => true)); ?>';
-                var parameters = {'shipping_fee': shipmentFee};
+                var parameters = {
+                    'shipping_fee': shipmentFee,
+                    'shipping_id': generatedId,
+                    'shipping_postcode': shipmentPostcode,
+                    'shipping_info': $('notime_confirmed_time_window_description').getValue(),
+                    'shipping_timewindowdate': selectedTimeWindowDate,
+                    'shipping_serviceguid': selectedServiceGuid
+                };
+
                 new Ajax.Request(urlNotime, {
                     method:'post',
                     parameters:parameters,
@@ -73,34 +101,63 @@
         }
 		
 		var timeWindowConfirmedHandler = function(event){
-			$('notime_shipment_id').setValue('-'); //Default value unless shipmentId have generated yet.
-			$('notime_shipment_success').update('');
+
+            //Default value unless shipmentId have generated yet.
+            $('notime_shipment_id').setValue('-');
+            $('notime_shipment_fee').setValue(0);
+            $('notime_shipment_success').update('');
+
+            var confirmedTimeWindowDescription = event.detail.selectedTimeWindowDescription;
+            $('notime_confirmed_time_window_description').setValue(confirmedTimeWindowDescription);
+
 		}
 		
         document.body.addEventListener("notime_widget:shipmentGenerated",shipmentGeneratedHandler);
 		document.body.addEventListener("notime_widget:timeWindowConfirmed",timeWindowConfirmedHandler);
 
+        function setSelectedService() {
+            window.Notime.Widget.setSelectedService(<?php echo $this->getShipmentServiceguid();?>, <?php echo $this->getShipmentTimewindowdate();?>);
+        }
+        
         function load_js() {
             var head= document.getElementsByTagName('head')[0];
             var script= document.createElement('script');
             script.type= 'text/javascript';
             script.src= '<?php echo $this->getWidgetCodeSrc(); ?>';
+
+            if (script.readyState) {
+                script.onreadystatechange = function () { // For old versions of IE
+                    if (this.script === 'complete' || this.script === 'loaded') {
+                        setSelectedService();
+                    }
+                };
+            } else { // Other browsers
+                script.onload = setSelectedService;
+            }
+
             head.appendChild(script);
+
         }
         load_js();
 
         document.observe('dom:loaded', function(){
+
             createNotimeShippingForm<?php echo $formCode ?>();
         });
-
-        createNotimeShippingForm<?php echo $formCode ?>();
 
         function createNotimeShippingForm<?php echo $formCode ?>(){
             new NotimeShippingForm('<?php echo $rate_id; ?>','<?php echo $formCode; ?>');
         }
         
-         Translator.add('Click here and choose your delivery time-slot','<?php echo Mage::helper('notimeshipping')->__('Click here and choose your delivery time-slot')?>');
-		 updateShippingPriceLabel('');
+        new NotimeShippingForm('<?php echo $rate_id; ?>','<?php echo $formCode; ?>');
+
+        updateShippingSuccessMessage();
+
+        $('<?php echo $this->getWidgetZipCode();?>').click();
+
+        Translator.add('Click here and choose your delivery time-slot','<?php echo Mage::helper('notimeshipping')->__('Click here and choose your delivery time-slot')?>');
+        Translator.add('Please choose another postcode or another delivery method','<?php echo Mage::helper('notimeshipping')->__('Please choose another postcode or another delivery method')?>');
+
     // ]]>
     </script>
 </ul>

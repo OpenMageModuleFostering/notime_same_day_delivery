@@ -10,17 +10,9 @@
  */
 class Notime_Shipping_Block_Checkout_Onepage_Shipping_Notime extends Mage_Checkout_Block_Onepage_Abstract
 {
-    protected function _construct()
-    {
+    protected function _construct() {
         $this->setTemplate('notime/checkout/onepage/shipping_method/notime.phtml');
 
-        /*
-        $this->getCheckout()->setStepData('shipping_method', array(
-            'label'     => Mage::helper('checkout')->__('Shipping Method'),
-            'is_show'   => $this->isShow()
-        ));
-        parent::_construct();
-        */
     }
 
     public function getFormCode(){
@@ -79,6 +71,60 @@ class Notime_Shipping_Block_Checkout_Onepage_Shipping_Notime extends Mage_Checko
     public function getAdditionalText(){
 		return Mage::getStoreConfig('carriers/notime/additional_info', Mage::app()->getStore()->getId());
     }
-    
 
+    public function getShipmentId() {
+
+        $this->checkShipmentZipcode();
+
+        $shipmentId = Mage::getSingleton('core/session')->getNotimeShipmentId();
+        return ($shipmentId && $shipmentId != '-') ? $shipmentId : '-';
+    }
+
+    public function getShipmentFee() {
+
+        $shipmentFee = Mage::getSingleton('core/session')->getNotimeShipmentFee();
+        return $shipmentFee ? $shipmentFee : 0;
+    }
+
+    public function getShipmentInfo() {
+
+        $shipmentInfo = Mage::getSingleton('core/session')->getNotimeShippingInfo();
+        return $shipmentInfo ? $shipmentInfo : '';
+    }
+
+    public function getShipmentTimewindowdate() {
+
+        $shipmentTimewindowdate = Mage::getSingleton('core/session')->getNotimeSelectedTimewindowdate();
+        return $shipmentTimewindowdate ? '\''.$shipmentTimewindowdate.'\'' : 'null';
+    }
+
+    public function getShipmentServiceguid() {
+
+        $shipmentServiceguid = Mage::getSingleton('core/session')->getNotimeSelectedServiceguid();
+        return $shipmentServiceguid ? '\''.$shipmentServiceguid.'\'' : 'null';
+    }
+
+    /*
+     * get shipment zipcode
+     */
+    public function checkShipmentZipcode() {
+
+        $shippingAddress = $this->getQuote()->getShippingAddress();
+        
+        $zip = $shippingAddress->getPostcode();
+        $zipNotime = Mage::getSingleton('core/session')->getNotimeShipmentPostcode();
+
+        if($zip != $zipNotime) {
+
+            Mage::getSingleton('core/session')->setNotimeShipmentFee(0);
+            Mage::getSingleton('core/session')->setNotimeShipmentId('-');
+            Mage::getSingleton('core/session')->setNotimeShipmentPostcode('');
+            Mage::getSingleton('core/session')->setNotimeShippingInfo('');
+            Mage::getSingleton('core/session')->setNotimeSelectedTimewindowdate('');
+            Mage::getSingleton('core/session')->setNotimeSelectedServiceguid('');
+
+            $shippingAddress->setCollectShippingRates(true)->save();
+
+        }
+    }
 }

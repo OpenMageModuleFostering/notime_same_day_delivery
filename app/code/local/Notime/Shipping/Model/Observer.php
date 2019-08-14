@@ -29,7 +29,6 @@ class Notime_Shipping_Model_Observer
                         $shipment_id = $shipment_id;
                         if($shipment_id) {
 
-                            // SEND POST REQUEST
                             // get customer shipping address
                             $_shippingAddress = $_order->getShippingAddress();
                             if($_shippingAddress->getId()) {
@@ -51,32 +50,31 @@ class Notime_Shipping_Model_Observer
                                     )
                                 );
 
-                                    $client = new Varien_Http_Client();
+                                $client = new Varien_Http_Client();
 
-                                    $client->setUri('https://v1.notimeapi.com/api/shipment/approve')
-                                        ->setConfig(array('timeout' => 30, 'keepalive' => 1))
-                                        ->setHeaders(array(
-                                        'Ocp-Apim-Subscription-Key' => '493dc25bf9674ccb9c5920a035c1f777',
-                                    ))
-                                        ->setRawData(json_encode($params), 'application/json')
-                                        ->setMethod(Zend_Http_Client::POST);
+                                $client->setUri('https://v1.notimeapi.com/api/shipment/approve')
+                                    ->setConfig(array('timeout' => 30, 'keepalive' => 1))
+                                    ->setHeaders(array(
+                                    'Ocp-Apim-Subscription-Key' => '493dc25bf9674ccb9c5920a035c1f777',
+                                ))
+                                    ->setRawData(json_encode($params), 'application/json')
+                                    ->setMethod(Zend_Http_Client::POST);
 
-                                    $client->setHeaders(array('Content-Type: application/json'));
+                                $client->setHeaders(array('Content-Type: application/json'));
 
-                                    $response = $client->request();
+                                $response = $client->request();
 
-                                    if($response->isSuccessful()){
-                                        // update status
-                                        $writeConnection->update(
-                                            'notime_shipping',
-                                            array('status' => 1),
-                                            'quote_id='.$_order->getQuoteId()
-                                        );
-                                        $_order->addStatusHistoryComment('Notime->Success: Shipment was approved successfully!')->save();
-                                    } else {
-                                        Mage::log('ERROR:'.$response->getMessage(),false,'notime-shipping.log');
-                                        //$_order->addStatusHistoryComment('Notime->Error: '.$response->getMessage());
-                                    }
+                                if($response->isSuccessful()){
+                                    // update status
+                                    $writeConnection->update(
+                                        'notime_shipping',
+                                        array('status' => 1),
+                                        'quote_id='.$_order->getQuoteId()
+                                    );
+                                    $_order->addStatusHistoryComment('Notime->Success: Shipment was approved successfully!')->save();
+                                } else {
+                                    Mage::log('ERROR:'.$response->getMessage(),false,'notime-shipping.log');
+                                }
                             }
                         }
                     } catch (Exception $e) {
@@ -84,7 +82,6 @@ class Notime_Shipping_Model_Observer
                     }
                 }
             }
-
         }
     }
 
@@ -93,19 +90,19 @@ class Notime_Shipping_Model_Observer
      *
      */
     public function notime_shipping_save_shipment_id($event) {
+
         if(!Mage::getStoreConfig('carriers/notime/active', Mage::app()->getStore()->getId())) return;
+
         $_quote  = $event->getQuote();
 
         $request = Mage::app()->getRequest();
         $shipmentId = trim($request->getPost('notime_shipment_id'));
-		$confirmedTimeWindowDescription = trim($request->getPost('notime_confirmed_time_window_description'));
-	
+
         if($shipmentId == '') { exit; }
 
         try {
 
             $resource = Mage::getSingleton('core/resource');
-            $readConnection = $resource->getConnection('core_read');
             $writeConnection = $resource->getConnection('core_write');
 
             $writeConnection->delete(
@@ -116,12 +113,15 @@ class Notime_Shipping_Model_Observer
                 "notime_shipping",
                 array("quote_id" => $_quote->getId(),"shipment_id" => $shipmentId, "status" => 0)
             );
-			$_quote->setExtShippingInfo($confirmedTimeWindowDescription);
+
         } catch (Exception $e) {
             mage::log('Error when processing shipping method:'.$e->getMessage(), false, 'notime_shipping.log');
         }
     }
 
+    /**
+     * @param $observer
+     */
     public function notime_shipping_core_block_html_after($observer)
     {
         if(!Mage::getStoreConfig('carriers/notime/active', Mage::app()->getStore()->getId())) return;
@@ -143,13 +143,6 @@ class Notime_Shipping_Model_Observer
                                 $carrier = Mage::getModel('shipping/config')->getCarrierInstance($code);
                                 $injectBlock = $block->getLayout()->createBlock($carrier->getFormBlock());
 
-                                //Store adress id so we can use it in the ajax call done in the block
-                                //$injectBlock->setAddressId($block->getAddress()->getId());
-                                //$injectBlock->setCountryCode($block->getAddress()->getCountryId());
-                                //$injectBlock->setMethodCode($code);
-                                //$injectBlock->setRate($_rate);
-                                //$injectBlock->setMethodInstance($carrier);
-
                                 $htmlBefore = substr($html,0,$pos2+strlen($endingToken));
                                 $htmlAfter = substr($html,$pos2);
                                 $observer->getTransport()->setHtml($htmlBefore.$injectBlock->toHtml().$htmlAfter);
@@ -159,44 +152,60 @@ class Notime_Shipping_Model_Observer
                 }
             }
         }
-
-        //$this->AddSalesRuleJavascript($observer);
     }
-	
-	public function notime_shipping_salesQuoteCollectTotalsAfter(Varien_Event_Observer $observer){
-        $shipmentFee = Mage::app()->getRequest()->getPost('notime_shipment_fee', -1);
+
+    /**
+     * Apply Notime shipping fee
+     * @param Varien_Event_Observer $observer
+     * @return Notime_Shipping_Model_Observer
+     */
+    public function notime_shipping_salesQuoteCollectTotalsBefore(Varien_Event_Observer $observer){
+
+        $shipmentFee = Mage::getSingleton('core/session')->getNotimeShipmentFee();
         if($shipmentFee == -1) {
             return $this;
         }
 
-        $quoteAddress = $observer->getQuoteAddress();
-        $quote = $observer->getQuoteAddress()->getQuote();
+        $quote = $observer->getQuote();
+        $address = $quote->getShippingAddress();
 
-        $store = Mage::app()->getStore($quote->getStoreId());
+        if('shipping' == $address->getAddressType()) {
+            if('notime_notime' == $address->getShippingMethod()) {
 
-        $carriers = Mage::getStoreConfig('carriers', $store);
-        foreach ($carriers as $carrierCode => $carrierConfig) {
-            if($carrierCode == 'notime') {
+                $store = Mage::app()->getStore($quote->getStoreId());
 
-                Mage::getSingleton('core/session')->setNotimeShipmentFee($shipmentFee);
-
-                $quoteAddress->setShippingAmount($shipmentFee)
-                    ->setBaseShippingAmount($shipmentFee)->save();
+                $carriers = Mage::getStoreConfig('carriers', $store);
+                foreach ($carriers as $carrierCode => $carrierConfig) {
+                    if($carrierCode == 'notime') {
+                        $store->setConfig("carriers/notime/price", $shipmentFee);
+                    }
+                }
             }
         }
 
         return $this;
-	}
- 
-	public function notime_shipping_salesOrderPlaceAfter(Varien_Event_Observer $observer) {
-        
-        Mage::getSingleton('core/session')->unsNotimeShipmentFee();
+    }
+
+    /**
+     * @param Varien_Event_Observer $observer
+     */
+    public function notime_shipping_salesOrderPlaceAfter(Varien_Event_Observer $observer) {
 
         $_order = $observer->getOrder();
-        $_quote = Mage::getModel('sales/quote')->load($_order->getQuoteId());
-        if($_quote->getId()) {
-            $_order->setShippingDescription($_order->getShippingDescription().' ('.$_quote->getExtShippingInfo().')')->save();
-        }
- }
 
+        if('notime_notime' == $_order->getShippingMethod()) {
+            $_order
+                ->setShippingDescription($_order->getShippingDescription().' ('.Mage::getSingleton('core/session')->getNotimeShippingInfo().')')
+                ->addStatusHistoryComment('Notime->ShipmentId: '.Mage::getSingleton('core/session')->getNotimeShipmentId())
+                ->save();
+        }
+
+        Mage::getSingleton('core/session')->unsNotimeShipmentFee();
+        Mage::getSingleton('core/session')->unsNotimeShippingInfo();
+        Mage::getSingleton('core/session')->unsNotimeShipmentId();
+        Mage::getSingleton('core/session')->unsNotimeShipmentPostcode();
+        Mage::getSingleton('core/session')->unsNotimeSelectedTimewindowdate();
+        Mage::getSingleton('core/session')->unsNotimeSelectedServiceguid();
+
+    }
 }

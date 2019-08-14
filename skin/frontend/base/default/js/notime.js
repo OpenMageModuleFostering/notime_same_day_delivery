@@ -43,13 +43,26 @@ NotimeShippingForm.prototype = {
     },
     _addValidation: function(){
         var self = this;
+
         Validation.add('required-notime-shipment',Translator.translate('Click here and choose your delivery time-slot'),function(value){
-            if(value != '' && value != '-')
+            var $notimeWidgetNotSupportedPostcodeContainer = $('notimeWidgetNotSupportedPostcodeContainer');
+            if((value != '' && value != '-') || $notimeWidgetNotSupportedPostcodeContainer.visible())
             {
                 return true;
             }
             return false;
         });
+
+
+        Validation.add('required-notime-shipment-notsupported',Translator.translate('Please choose another postcode or another delivery method'),function(value){
+            var $notimeWidgetNotSupportedPostcodeContainer = $('notimeWidgetNotSupportedPostcodeContainer');
+            if((value == '' || value == '-') && $notimeWidgetNotSupportedPostcodeContainer.visible())
+            {
+                return false;
+            }
+            return true;
+        });
+
     },
     _validate: function(){
 
