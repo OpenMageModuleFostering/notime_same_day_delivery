@@ -17,6 +17,9 @@
     <input type="hidden" id="notime_shipment_id" name="notime_shipment_id" class="input-text required-notime-shipment" value="-">
     <input type="hidden" id="notime_shipment_fee" name="notime_shipment_fee" class="input-text" value="">
 	<input type="hidden" id="notime_confirmed_time_window_description" name="notime_confirmed_time_window_description" class="input-text" value="">
+	<div id='notimeWidgetNotSupportedPostcodeContainer'>
+    <span><?php echo $this->__('Not Supported Postcode'); ?></span>
+	</div>
     <li>
         <?php echo $this->getWidgetButton(); ?>
         <span id="notime_shipment_success"></span>
