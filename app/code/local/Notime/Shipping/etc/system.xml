@@ -38,6 +38,7 @@
                         </title>
                         <price translate="label">
                             <label>Price</label>
+                            <comment><![CDATA[Don't use this field. Price will be calculated dynamically.]]></comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>4</sort_order>
                             <show_in_default>1</show_in_default>

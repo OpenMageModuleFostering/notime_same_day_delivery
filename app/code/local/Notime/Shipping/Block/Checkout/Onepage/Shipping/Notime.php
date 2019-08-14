@@ -75,5 +75,10 @@ class Notime_Shipping_Block_Checkout_Onepage_Shipping_Notime extends Mage_Checko
         }
         return '';
     }
+    
+    public function getAdditionalText(){
+		return Mage::getStoreConfig('carriers/notime/additional_info', Mage::app()->getStore()->getId());
+    }
+    
 
 }

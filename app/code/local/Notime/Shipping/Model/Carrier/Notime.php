@@ -53,6 +53,11 @@ class Notime_Shipping_Model_Carrier_Notime
         } else {
             $shippingPrice = false;
         }
+        
+        $shipmentFee = Mage::getSingleton('core/session')->getNotimeShipmentFee();
+        if($shipmentFee) {
+            $shippingPrice = $shipmentFee;
+        }
 
         if ($shippingPrice !== false) {
             $method = Mage::getModel('shipping/rate_result_method');

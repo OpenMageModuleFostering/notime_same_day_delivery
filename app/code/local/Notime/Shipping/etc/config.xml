@@ -89,15 +89,24 @@
                     </notime_core_block_html_before>
                 </observers>
             </core_block_abstract_to_html_after>
-            <sales_quote_collect_totals_before>
+            <sales_quote_address_collect_totals_after>
               <observers>
                 <notime_order_change_price>
                   <type>singleton</type>
                   <class>Notime_Shipping_Model_Observer</class>
-                  <method>notime_shipping_salesQuoteCollectTotalsBefore</method>
+                  <method>notime_shipping_salesQuoteCollectTotalsAfter</method>
                 </notime_order_change_price>
               </observers>
-            </sales_quote_collect_totals_before>
+            </sales_quote_address_collect_totals_after>
+            <sales_order_place_after>
+              <observers>
+                <notime_order_place_after>
+                  <type>singleton</type>
+                  <class>Notime_Shipping_Model_Observer</class>
+                  <method>notime_shipping_salesOrderPlaceAfter</method>
+                </notime_order_place_after>
+              </observers>
+            </sales_order_place_after>
         </events>
     </global>
     <adminhtml>
@@ -119,7 +128,7 @@
                 <name>Same-day (by notime)</name>
                 <price>4.90</price>
                 <title>Same-day (by notime)</title>
-                <type>0</type>
+                <type>O</type>
                 <shipping_widget></shipping_widget>
                 <product_widget></product_widget>
                 <show_product_widget></show_product_widget>
