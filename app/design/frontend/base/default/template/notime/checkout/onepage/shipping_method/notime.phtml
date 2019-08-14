@@ -56,6 +56,19 @@
                     $validationError.hide();
                 }
                 $('notime_shipment_success').update('<?php echo $this->__('You have successfully selected time window'); ?>');
+
+                // update totals
+                var urlNotime = '<?php echo $this->getUrl('notimeshipping/index/index', array('_secure' => true)); ?>';
+                var parameters = {'shipping_fee': shipmentFee};
+                new Ajax.Request(urlNotime, {
+                    method:'post',
+                    parameters:parameters,
+                    onSuccess:function(transport) {
+                        if (transport.status == 200) {
+                            $('<?php echo $this->getWidgetZipCode();?>').click();
+                        }
+                    }
+                });
             }
         }
 		

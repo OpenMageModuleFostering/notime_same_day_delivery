@@ -7,6 +7,15 @@
         </Notime_Shipping>
     </modules>
     <frontend>
+        <routers>
+            <notime_shipping>
+                <use>standard</use>
+                <args>
+                    <module>Notime_Shipping</module>
+                    <frontName>notimeshipping</frontName>
+                </args>
+            </notime_shipping>
+        </routers>
         <layout>
             <updates>
                 <notime_shipping>
