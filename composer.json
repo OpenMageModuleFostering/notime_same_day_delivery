@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/notime_same_day_delivery",
+    "name": "OpenMageModuleFostering\/notime_same_day_delivery",
     "type": "magento-module",
     "license": "Open-Software-License-(OSL)",
     "homepage": "",
     "description": "It is an extension that allows merchants to add  same-day shipping by notime to the store. notime is supported in all major Swiss cities.",
     "authors": [
-    {
-        "name": "notime",
-        "email": "dmitry.zhersh@notime.eu"
-    }
-],
+        {
+            "name": "notime",
+            "email": "dmitry.zhersh@notime.eu"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
